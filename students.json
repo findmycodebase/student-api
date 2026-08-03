@@ -1,0 +1,15 @@
+[
+    {
+        "student_id": "string",
+        "first_name": "string",
+        "last_name": "string",
+        "email": "string",
+        "phone_number": "string",
+        "age": 0,
+        "gender": "string",
+        "course": "string",
+        "level": 0,
+        "cgpa": 0.0,
+        "status": "string"
+    }
+]

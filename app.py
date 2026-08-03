@@ -1,4 +1,7 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+
+from schemas import Student
+from storage import read_students, write_students
 
 app = FastAPI()
 
@@ -16,15 +19,30 @@ def about():
         "author": "Rejoice Oyebode",
         "version": "1.0"
     }
-
-@app.get("/student/{name}")
-def get_student(name: str):
+@app.post("/students")
+def create_student(student: Student):
+    students = read_students()
+    for existing_student in students:
+        if existing_student["student_id"] == student.student_id: 
+            raise HTTPException(status_code=409, detail="Student with this ID already exists.")
+        elif existing_student["email"] == student.email:
+            raise HTTPException(status_code=409, detail="Student with this email already exists.")
+    students.append(student.model_dump())
+    write_students(students)
     return {
-        "message": f"Welcome, {name}!"
+        "message": "Student created successfully.",
+        "student": student
     }
 
-@app.get("/student/{name}/{age}")
-def get_student_info(name: str, age: int):
-    return {
-        "message": f"Student Name: {name}, Age: {age}"
-    }
+@app.get("/students")
+def get_students():
+    students = read_students()
+    return students
+
+@app.get("/students/{student_id}")
+def get_student(student_id: str):
+    students = read_students()
+    for existing_student in students:
+        if existing_student["student_id"] == student_id:
+            return existing_student
+    raise HTTPException(status_code=404, detail="Student not found.")
